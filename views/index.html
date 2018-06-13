@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/index.css">
+
+</head>
+<body>
+    <div class="box">
+        <p class="content">五子棋双人对战(单机版)</p>
+        <!--<p class="text">-->
+            <!--<a href="#" id="changeBlack">黑方先下</a>-->
+            <!--<a href="#" id="changeWhite">白方先下</a>-->
+        <!--</p>-->
+        <p id="finish">已下招数: &nbsp;&nbsp;<span>0</span><strong>请执&nbsp;<em>黑子</em>&nbsp;者下棋</strong></p>
+        <div id="box">
+            <!--使用ejs模板引擎来渲染页面-->
+            <!--<script type="text/html" id="chess">-->
+                <div id="tip">12321</div>
+                <a href="javascript:;" id="reStart">重新开始</a>
+               <!-- {{ list.forEach (item=>{
+                    <i class="{{item.sataus}}" style="position: absolute;left:"+{{item.left}}+";"></i>
+                {{  }) }}-->
+        <!-- </script>-->
+
+        </div>
+    </div>
+
+
+    <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="../js/jquery-1.10.1.min.js"></script>
+    <script src="../js/template.js"></script>
+    <script src="../js/index.js"></script>
+</body>
+</html>

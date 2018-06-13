@@ -1,149 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        body,p{
-            margin: 0;
-            padding: 0;
-        }
-        .box{
-            width: 400px;
-            margin: 100px auto 0;
-        }
-        #box{
-            width: 400px;
-            height: 400px;
-            border: 1px solid #000;
-            position: relative;
-            background-color: rgba(204,204,204,1);
-        }
-        .row{
-            height: 1px;
-            width: 400px;
-            background-color: #000;
-            position: absolute;
-        }
-        .column{
-            width: 1px;
-            height: 400px;
-            background-color: #000;
-            position: absolute;
-        }
-        .black{
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #000;
-            position: absolute;
-        }
-        .white{
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #fff;
-            position: absolute;
-        }
-        #tip{
-            width: 200px;
-            height: 50px;
-            line-height: 50px;
-            color: #ff7815;
-            text-align: center;
-            font-size: 24px;
-            background-color: rgba(220,255,253,0.5);
-            border-radius: 30px;
-            position: absolute;
-            left: 50%;
-            top: 40%;
-            transform: translate(-50%,-50%);
-            z-index:23;
-            display: none;
-        }
-        #reStart{
-            width: 100px;
-            height: 30px;
-            line-height: 30px;
-            text-decoration: none;
-            color: #3640ff;
-            text-align: center;
-            font-size: 16px;
-            background-color: rgba(221,177,255,0.5);
-            border-radius: 30px;
-            position: absolute;
-            left: 50%;
-            top: 60%;
-            transform: translate(-50%,-50%);
-            z-index:23;
-            display: none;
-        }
-        #reStart:hover{
-            color:red;
-        }
-        .text{
-            width: 100%;
-            text-align: center;
-            margin-bottom:20px;
-        }
-        .text a{
-            padding: 5px 10px;
-            text-decoration: none;
-            background-color: red;
-            margin: 0 20px;
-        }
-        .text a:first-child{
-            background-color: #0a5493;
-            color: #000;
-        }
-        .text a:last-child{
-            background-color: #000;
-            color: #0a5493;
-        }
-        .text a:hover{
-            color: red;
-        }
-        #finish{
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        #finish span{
-            color:red;
-        }
-        #finish strong{
-            float: right;
-        }
-        #finish strong em{
-            color:red;
-            font-size: 20px;
-        }
-        .content{
-            width: 100%;
-            height: 30px;
-            font-size: 30px;
-            font-weight: bold;
-            text-align: center;
-            padding-bottom: 40px;
-        }
-    </style>
-    <script src="jquery-1.10.1.min.js"></script>
-</head>
-<body>
-    <div class="box">
-        <p class="content">五子棋双人对战(单机版)</p>
-        <p class="text">
-            <a href="#" id="changeBlack">黑方先下</a>
-            <a href="#" id="changeWhite">白方先下</a>
-        </p>
-        <p id="finish">已下招数: &nbsp;&nbsp;<span>0</span><strong>请执&nbsp;<em>黑子</em>&nbsp;者下棋</strong></p>
-        <div id="box">
-            <div id="tip">12321</div>
-            <a href="#" id="reStart">重新开始</a>
-        </div>
-    </div>
+/**
+ * Created by mycontent on 2017/7/29.
+ */
 
-<script>
-window.onload = function () {
+$(function () {
+    //  ws://表示走的是WebSocket协议
+    var ws = new WebSocket('ws://127.0.0.1:9009');
+
+
     var oDiv = $('#box');
     var em = $('#finish em');
     //设置棋盘的宽高
@@ -155,13 +18,54 @@ window.onload = function () {
     var flag = true;
 
     //用于保存已经生成的棋子的坐标,作为判断某个位置是否已经有棋子的依据,注意数组里面必须初始添加一组数组,否则就无法做出判断
-    var pos = [{left:0,top:0}];
+    var pos = [{left:-1,top:-1}];
+
+    // 每当客户端接收到服务器发送过来的消息后，都会触发 onmessage 事件
+    ws.onmessage = function (e) {
+        console.log(e.data);
+        var data = JSON.parse(e.data);
+        console.log(typeof data);
+        pos = JSON.parse(e.data);
+
+        var num = 0;
+        pos.forEach(function (item,index) {
+            if ( item.left ) {
+                num++;
+            }
+        });
+        sum = num;
+        $('#finish span').html(sum);
+    }
+
+    //在一进入页面就进行一次post请求的目的是为了将data.json文件中的所有数据请求回页面进行后续操作
+    //postData({});
+    function postData(data) {
+        $.ajax({
+            type:'post',
+            url:'/',
+            data:data,
+            dataType:'json',
+            success:function (data) {
+                // console.log(data);
+                pos = data;
+                var num = 0;
+                pos.forEach(function (item,index) {
+                    if ( item.left ) {
+                        num++;
+                    }
+                });
+                sum = num;
+                $('#finish span').html(sum);
+            }
+        });
+    }
+
 
     //设置黑方先走
     $('#changeBlack').on('click',chooseBlack);
     //设置白方先走
     $('#changeWhite').on('click',chooseWhite);
-    
+
     function chooseBlack() {
         flag = true; //区分黑白棋子
         $(this).css('opacity',0.8);
@@ -205,17 +109,17 @@ window.onload = function () {
         setTimeout(function () {
             //获取当前鼠标点击位置的棋子坐标
             function getPos() {
-                var pageX = e.pageX - oDiv.offset().left;
-                var pageY = e.pageY - oDiv.offset().top;
+                var clientX = e.clientX - oDiv.offset().left + $(window).scrollLeft();
+                var clientY = e.clientY - oDiv.offset().top + $(window).scrollTop();
 
                 //获取鼠标点击的位置坐标
-                var x1 = Math.floor(pageX / d);
-                var y1 = Math.floor(pageY / d);
+                var x1 = Math.floor(clientX / d);
+                var y1 = Math.floor(clientY / d);
                 //设置生成的棋子的坐标
                 var x2 = x1 * d + 2;
                 var y2 = y1 * d + 2;
                 return {x:x2,y:y2};
-            }
+            };
 
             createPieces();
             //点击创建黑白棋子函数
@@ -238,25 +142,33 @@ window.onload = function () {
                 if (b) {
                     var i = $('<i>');
                     flag ? i.addClass('black') : i.addClass('white');
+                    if ( flag ) {
+                        pos.push({status:'black',left:x2,top:y2});
+                        postData({status:'black',left:x2,top:y2});
+                    }else{
+                        pos.push({status:'white',left:x2,top:y2});
+                        postData({status:'white',left:x2,top:y2});
+                    }
                     flag = !flag;
                     i.css({
                         left: x2,
                         top: y2
                     });
-                    pos.push({left: x2, top: y2});
                     i.appendTo(oDiv);
                     sum++;
                     $('#finish span').html(sum);
                     flag==true?em.html('黑子'):em.html('白子');
+
                 };
+
             };
 
             /*胜负判断函数,思路是:
-                1.每次点击生成一个棋子时就创建4个空数组,
-                2.然后根据当前棋子的颜色与坐标给4个空数组添加4个方向的连续的前后9个坐标值,
-                3.再循环判断所有的黑子和白字的坐标值是否存在5个连续的棋子在4个不同方向的某一个方向上连成一线了
-                4.如果存在5个同颜色的棋子在某一个方向上连成一线了,则根据颜色判断某一方胜出,并锁住棋盘,游戏结束
-            */
+             1.每次点击生成一个棋子时就创建4个空数组,
+             2.然后根据当前棋子的颜色与坐标给4个空数组添加4个方向的连续的前后9个坐标值,
+             3.再循环判断所有的黑子和白字的坐标值是否存在5个连续的棋子在4个不同方向的某一个方向上连成一线了
+             4.如果存在5个同颜色的棋子在某一个方向上连成一线了,则根据颜色判断某一方胜出,并锁住棋盘,游戏结束
+             */
             //创建棋子坐标数组待检测判断
             function test(color) {
                 //获取当前点击位置坐标
@@ -388,6 +300,15 @@ window.onload = function () {
 
     //点击重新开始游戏
     $('#reStart').on('click',function () {
+        $.ajax({
+            type:'get',
+            url:'/reStart',
+            dataType:'json',
+            success:function (data) {
+                console.log(data);
+                pos = [{left:-1,top:-1}];
+            }
+        });
         //移除所有的i标签
         $('i').remove();
         //恢复棋盘的初始状态并重新绑定事件函数
@@ -406,12 +327,9 @@ window.onload = function () {
         $('#finish span').html(sum);
         flag = true;
         //用于保存已经生成的棋子的坐标,作为判断某个位置是否已经有棋子的依据,注意数组里面必须初始添加一组数组,否则就无法做出判断
-        pos = [{left:0,top:0}];
+        // pos = [{left:-1,top:-1}];
         //最后设置return false是为了阻止重新开始按钮的冒泡事件
         return false;
     })
 
-}
-</script>
-</body>
-</html>
+});
