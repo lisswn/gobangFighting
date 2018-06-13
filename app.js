@@ -124,8 +124,8 @@ io.sockets.on('connection',function (socket) {
 
 // 调用 app.listen 方法，指定端口号并启动web服务器
 baseServer.listen(9000,function () {
-    // console.log('http://127.0.0.1:9000');
-    console.log('http://192.168.1.104:9000');
+    console.log('http://127.0.0.1:9000');
+    // console.log('http://192.168.1.104:9000');
 })
 
 

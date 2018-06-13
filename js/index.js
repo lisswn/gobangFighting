@@ -4,8 +4,8 @@
 
 $(function () {
     //创建socket.io的连接，连接服务器
-    var socket = io.connect('http://192.168.1.104:9000');
-    // var socket = io.connect('http://127.0.0.1:9000');
+    // var socket = io.connect('http://192.168.1.104:9000');
+    var socket = io.connect('http://127.0.0.1:9000');
 
     var oDiv = $('#box');
     var em = $('#finish em');
